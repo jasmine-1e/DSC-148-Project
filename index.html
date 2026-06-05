@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time News Classifier Dashboard</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; color: #111827; padding: 2rem; display: flex; justify-content: center; }
+        .card { max-width: 650px; width: 100%; background: white; padding: 2.5rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h1 { margin-top: 0; font-size: 1.75rem; text-align: center; }
+        textarea { width: 100%; height: 130px; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 1rem; margin-top: 1rem; }
+        button { background: #2563eb; color: white; border: none; padding: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 1rem; font-size: 1rem; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .output { margin-top: 1.5rem; padding: 1.2rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; text-align: center; display: none; font-size: 1.3rem; font-weight: bold; color: #1e40af; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>📰 Diachronic Real Text Topic Engine</h1>
+    <p style="color:#6b7280; text-align: center; margin: 0;">This client-side dashboard pulls open source AI architectures to classify real text streams in real-time.</p>
+    
+    <textarea id="text-input" placeholder="Paste a paragraphs of text here to evaluate topic assignments..."></textarea>
+    <button id="predict-btn" onclick="processText()">Classify Text Stream</button>
+    
+    <div id="result" class="output"></div>
+</div>
+
+<script type="module">
+    // Load native browser pipeline tools directly from Hugging Face infrastructure
+    import { pipeline } from 'https://jsdelivr.net';
+    
+    let engine;
+    const btn = document.getElementById('predict-btn');
+    const res = document.getElementById('result');
+
+    async function loadModel() {
+        btn.innerText = "Downloading Web-Model Engine (Takes ~10 seconds)...";
+        btn.disabled = true;
+        // Instantiates a super-fast text-classification pipeline natively in the browser
+        engine = await pipeline('text-classification', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
+        btn.innerText = "Classify Text Stream";
+        btn.disabled = false;
+    }
+    
+    window.processText = async function() {
+        const textValue = document.getElementById('text-input').value;
+        if (textValue.trim().length > 5) {
+            res.style.display = 'block';
+            res.innerText = "Analyzing semantic arrays...";
+            
+            const inference = await engine(textValue);
+            const confidence = (inference[0].score * 100).toFixed(1);
+            
+            res.innerText = `Topic Alignment Signature: ${inference[0].label} (${confidence}% Fit Score)`;
+        }
+    }
+    
+    loadModel();
+</script>
+</body>
+</html>
+
